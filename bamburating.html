@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#181a1b" />
+    <title>Bamboo — How was your visit?</title>
+    <style>
+      :root {
+        /* Palette (Bamboo) */
+        --bg-900: #181a1b;
+        --surface-800: #262a2b;
+        --surface-700: #303436;
+        --border-600: #3b3b3b;
+        --text-100: #e8e6e3;
+        --text-300: #736b5e;
+        --text-400: #545b5e;
+        --text-500: #858585;
+        --accent-700: #9e551d;
+        --accent-400: #f0a66d;
+
+        /* Type & layout */
+        --fs-sm: clamp(13px, 2.9vw, 14px);
+        --fs-md: clamp(15px, 3.5vw, 16px);
+        --fs-lg: clamp(18px, 4.2vw, 20px);
+        --radius: 16px;
+        --ring: 0 0 0 6px rgba(158, 85, 29, 0.35);
+        --shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        --safe-b: env(safe-area-inset-bottom, 0px);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg-900);
+        color: var(--text-100);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .wrap {
+        margin: auto;
+        width: min(720px, 92vw);
+        padding: 20px;
+        padding-bottom: calc(20px + var(--safe-b));
+      }
+      .card {
+        background: var(--surface-800);
+        border: 1px solid var(--border-600);
+        border-radius: 20px;
+        padding: 22px;
+        box-shadow: var(--shadow);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--surface-700);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        color: var(--accent-400);
+        user-select: none;
+      }
+      h1 {
+        margin: 0 0 6px 0;
+        font-size: var(--fs-lg);
+        line-height: 1.2;
+      }
+      p {
+        margin: 0;
+        color: var(--text-300);
+        font-size: var(--fs-sm);
+      }
+
+      /* Stars: real star UI (☆ outline -> ★ orange when active) */
+      .stars {
+        display: flex;
+        gap: clamp(8px, 4vw, 14px);
+        margin: 16px auto 8px;
+        justify-content: center;
+        width: max-content;
+        max-width: 100%;
+      }
+      .star {
+        /* big tap target, but no boxy background */
+        width: clamp(48px, 16vw, 60px);
+        height: clamp(48px, 16vw, 60px);
+        border: none;
+        background: transparent;
+        color: var(--text-400);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        font-size: clamp(34px, 9vw, 40px);
+        line-height: 1;
+        padding: 0;
+        border-radius: 12px;
+        touch-action: manipulation;
+        transition: 0.15s transform, 0.15s color, 0.15s box-shadow;
+      }
+      .star:hover {
+        transform: translateY(-1px);
+        color: var(--accent-400);
+      }
+      .star:focus-visible {
+        outline: none;
+        box-shadow: var(--ring);
+      }
+      .star.active {
+        color: var(--accent-700);
+      } /* ★ orange */
+
+      .hint {
+        font-size: var(--fs-sm);
+        text-align: center;
+        color: var(--text-400);
+      }
+
+      .section {
+        display: none;
+        margin-top: 12px;
+      }
+      .section.show {
+        display: block;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-600);
+        background: var(--surface-700);
+        color: var(--text-100);
+        padding: 12px;
+        font-size: var(--fs-md);
+        resize: vertical;
+        line-height: 1.45;
+      }
+      textarea::placeholder {
+        color: #bdbdbd;
+      } /* better contrast on dark */
+
+      .actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .btn {
+        appearance: none;
+        border: none;
+        border-radius: var(--radius);
+        padding: 16px;
+        font-size: var(--fs-md);
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 52px;
+        touch-action: manipulation;
+      }
+      .btn:focus-visible {
+        outline: none;
+        box-shadow: var(--ring);
+      }
+      .btn-primary {
+        background: var(--accent-700);
+        color: #fff;
+      }
+      .btn-neutral {
+        background: transparent;
+        color: var(--text-100);
+        border: 1px solid var(--border-600);
+      }
+
+      .subtle {
+        font-size: var(--fs-sm);
+        color: var(--text-400);
+        text-align: center;
+      }
+      .subtle a {
+        color: var(--accent-400);
+      }
+
+      @media (max-width: 380px) {
+        .stars {
+          gap: clamp(6px, 4vw, 10px);
+        }
+      }
+      @media (min-width: 768px) {
+        .wrap {
+          width: min(680px, 92vw);
+        }
+        .stars {
+          gap: clamp(8px, 1vw, 12px);
+        }
+        .actions {
+          gap: 8px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .star,
+        .btn {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card" role="region" aria-labelledby="title">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">B</div>
+          <div>
+            <h1 id="title">Bamboo — How was your visit?</h1>
+            <p>Tap to rate your experience</p>
+          </div>
+        </div>
+
+        <!-- Stars -->
+        <div
+          class="stars"
+          id="stars"
+          role="radiogroup"
+          aria-label="Rate your visit"
+        >
+          <button
+            class="star"
+            data-val="1"
+            role="radio"
+            aria-checked="false"
+            aria-label="1 star"
+          >
+            ☆
+          </button>
+          <button
+            class="star"
+            data-val="2"
+            role="radio"
+            aria-checked="false"
+            aria-label="2 stars"
+          >
+            ☆
+          </button>
+          <button
+            class="star"
+            data-val="3"
+            role="radio"
+            aria-checked="false"
+            aria-label="3 stars"
+          >
+            ☆
+          </button>
+          <button
+            class="star"
+            data-val="4"
+            role="radio"
+            aria-checked="false"
+            aria-label="4 stars"
+          >
+            ☆
+          </button>
+          <button
+            class="star"
+            data-val="5"
+            role="radio"
+            aria-checked="false"
+            aria-label="5 stars"
+          >
+            ☆
+          </button>
+        </div>
+        <div id="hint" class="hint">Select a rating to continue</div>
+
+        <!-- High rating (4–5) -->
+        <div id="hi" class="section" aria-live="polite">
+          <p style="font-size: var(--fs-sm)">
+            Thanks! Want to share on Google?
+          </p>
+          <div class="actions">
+            <button class="btn btn-primary" id="googleBtn">
+              Post a Google review
+            </button>
+            <button class="btn btn-neutral" id="hiFeedbackToggle">
+              Send us a feedback! (optional)
+            </button>
+          </div>
+          <form id="hiForm" class="section" style="margin-top: 8px">
+            <label
+              for="hiComment"
+              class="subtle"
+              style="display: block; text-align: left; margin-bottom: 6px"
+              >Your comments (we’ll copy this so you can paste on Google)</label
+            >
+            <textarea
+              id="hiComment"
+              placeholder="Anything we did great?"
+            ></textarea>
+            <div class="actions">
+              <button type="submit" class="btn btn-neutral">
+                Send feedback to Bamboo
+              </button>
+            </div>
+            <div class="subtle" style="margin-top: 6px">
+              We’ll open Google Reviews in a new tab and copy your text.
+            </div>
+          </form>
+        </div>
+
+        <!-- Low rating (1–3) -->
+        <div id="lo" class="section" aria-live="polite">
+          <p style="font-size: var(--fs-sm)">Tell us what happened.</p>
+          <!-- collapsed textarea: opens after tap -->
+          <div class="actions">
+            <button class="btn btn-primary" id="loFeedbackToggle">
+              Send us a feedback!
+            </button>
+          </div>
+          <form id="loForm" class="section" style="margin-top: 8px">
+            <label
+              for="loComment"
+              class="subtle"
+              style="display: block; text-align: left; margin-bottom: 6px"
+              >Your feedback</label
+            >
+            <textarea
+              id="loComment"
+              placeholder="Tell us what we can improve. This goes directly to our team."
+            ></textarea>
+            <div class="actions">
+              <button type="submit" class="btn btn-primary">
+                Send feedback
+              </button>
+            </div>
+          </form>
+          <div class="subtle" style="margin-top: 10px">
+            Prefer to leave a public review?
+            <a id="loGoogleLink" href="#" target="_blank" rel="noopener"
+              >Open Google Reviews</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ==== CONFIG ====
+      // Prefer the short link from Google Business Profile:
+      // const GOOGLE_REVIEW_URL = "https://g.page/r/XXXXX/review";
+      // Using your maps URL also works:
+      const GOOGLE_REVIEW_URL =
+        "https://www.google.com/maps/place/Bambu+Restaurant/@45.3327764,-75.6975879,17z/data=!4m8!3m7!1s0x4cce07d844d11be9:0x5267f35c2fa3a0b0!8m2!3d45.3327765!4d-75.692717!9m1!1b1!16s%2Fg%2F1vqmh_fv?entry=ttu";
+      const FEEDBACK_ENDPOINT = "/feedback"; // your backend/Formspree/Netlify endpoint
+
+      // ==== UI state ====
+      let rating = 0;
+      const starsEl = document.getElementById("stars");
+      const hintEl = document.getElementById("hint");
+      const hiEl = document.getElementById("hi");
+      const loEl = document.getElementById("lo");
+
+      // Render ☆/★ + color per rating
+      function renderStars(n) {
+        document.querySelectorAll(".star").forEach((btn, i) => {
+          const active = i < n;
+          btn.textContent = active ? "★" : "☆";
+          btn.classList.toggle("active", active);
+          btn.setAttribute("aria-checked", String(active));
+        });
+      }
+
+      function setStars(n) {
+        rating = n;
+        renderStars(n);
+        hintEl.textContent =
+          n >= 4
+            ? "Great! Share on Google or send feedback."
+            : n
+            ? "Tell us what happened."
+            : "Select a rating to continue";
+        hiEl.classList.toggle("show", n >= 4);
+        loEl.classList.toggle("show", n > 0 && n <= 3);
+      }
+
+      // Tap/click
+      starsEl.addEventListener("click", (e) => {
+        const btn = e.target.closest(".star");
+        if (!btn) return;
+        setStars(Number(btn.dataset.val));
+        btn.focus({ preventScroll: true });
+      });
+
+      // Keyboard support (← → 1–5)
+      starsEl.addEventListener("keydown", (e) => {
+        const key = e.key;
+        if (/^[1-5]$/.test(key)) {
+          setStars(Number(key));
+          return;
+        }
+        if (key === "ArrowRight") {
+          setStars(Math.min(5, rating + 1));
+        }
+        if (key === "ArrowLeft") {
+          setStars(Math.max(1, rating - 1));
+        }
+      });
+
+      // Clipboard + open Google
+      async function openGoogleWithCopy(text) {
+        const t = (text || "").trim();
+        if (t) {
+          try {
+            await navigator.clipboard.writeText(t);
+          } catch (_) {}
+        }
+        window.open(GOOGLE_REVIEW_URL, "_blank", "noopener,noreferrer");
+      }
+
+      // High-rating actions
+      document.getElementById("googleBtn").addEventListener("click", () => {
+        openGoogleWithCopy(document.getElementById("hiComment").value);
+      });
+      document
+        .getElementById("hiFeedbackToggle")
+        .addEventListener("click", () => {
+          document.getElementById("hiForm").classList.toggle("show");
+        });
+
+      // Low-rating actions (collapsed textarea until tapped)
+      document
+        .getElementById("loFeedbackToggle")
+        .addEventListener("click", () => {
+          document.getElementById("loForm").classList.toggle("show");
+        });
+      document.getElementById("loGoogleLink").addEventListener("click", () => {
+        openGoogleWithCopy(document.getElementById("loComment").value);
+      });
+
+      // Non-blocking POST helper
+      async function postJSON(url, data) {
+        try {
+          await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+        } catch (e) {}
+      }
+
+      // Submit handlers
+      document
+        .getElementById("hiForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const comment = document.getElementById("hiComment").value.trim();
+          await postJSON(FEEDBACK_ENDPOINT, {
+            rating,
+            comment,
+            ts: Date.now(),
+          });
+          alert(
+            "Thanks! We’ll open Google Reviews in a new tab and copy your text."
+          );
+          openGoogleWithCopy(comment);
+        });
+
+      document
+        .getElementById("loForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const comment = document.getElementById("loComment").value.trim();
+          await postJSON(FEEDBACK_ENDPOINT, {
+            rating,
+            comment,
+            ts: Date.now(),
+          });
+          alert(
+            "Thanks for your feedback. Our team will review this promptly."
+          );
+        });
+    </script>
+  </body>
+</html>
